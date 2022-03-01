@@ -5,7 +5,7 @@
 %% --------------------------------------------------------------
 %% UTILISATION DE CARACTERES ACCENTUES AU CLAVIER ?
 %% (le codage du clavier depend du systeme d'exploitation)
-\usepackage[applemac]{inputenc} % MacOS
+% \usepackage[applemac]{inputenc} % MacOS
 % \usepackage[ansinew]{inputenc}  % Windows ANSI
 % \usepackage[cp437]{inputenc}    % DOS, page de code 437
 % \usepackage[cp850]{inputenc}    % DOS, page de code 850
@@ -18,8 +18,8 @@
 % \usepackage[latin3]{inputenc}
 %% --------------------------------------------------------------
 %% REGLES DE TYPOGRAPHIE FRANCAISES ?
-\usepackage[english,french]{babel}   % "babel.sty" + "french.sty"
-% \usepackage[english,francais]{babel} % "babel.sty"
+% \usepackage[french]{babel}   % "babel.sty" + "french.sty"
+\usepackage[english,francais]{babel} % "babel.sty"
 % \usepackage{french}                  % "french.sty"
 \usepackage{times}			% ajout times le 30 mai 2003
  
@@ -31,16 +31,90 @@
 \usepackage[T1]{fontenc}
 %% ==============================================================
 
-\titre{Instructions aux auteurs du GRETSI\\ Format \LaTeXe}
+\usepackage{amsmath,epsfig,hyperref,bbm,amsmath,stmaryrd,amssymb,setspace,multirow,scalerel,stackengine,dsfont,ragged2e,chngcntr,graphicx,subcaption,caption}
+
+%%%%%%%%%%%%%%%%%% Notations Mathématiques %%%%%%%%%%%%%%%%%
+% TENSORS 
+
+\newcommand{\tens}[1]{\boldsymbol{\mathcal{#1}}} % use calligraphics for tensors
+\newcommand{\tenselem}[2]{\mathcal{#1}_{#2}} % entry of a tensor
+
+% MATRICES
+\newcommand{\matr}[1]{\boldsymbol{#1}} % use capitals for matrices
+\newcommand{\matrelem}[2]{#1_{#2}} % entry of a matrix
+
+% VECTORS
+\newcommand{\vect}[1]{\boldsymbol{#1}} % use lowercases for vectors
+\newcommand{\vectelem}[2]{#1_#2} % entry of a vector
+
+% SETS, SPACES, VARIETIE
+\newcommand{\nset}[1]{\ifmmode\left\llbracket#1\right\rrbracket\else\fi} % ENTIRE SET
+
+%% OPERATORS %%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\out}{\mathop{\circ}}              % tensor outer product
+\DeclareMathOperator*{\Out}{\scalerel*{\out}{\sum}}  % Big khatri rao product
+
+\newcommand{\khatri}{\odot}                 % Khatri-Rao product
+\DeclareMathOperator*{\Khatri}{\scalerel*{\khatri}{\sum}}  % Big khatri rao product
+
+\newcommand{\hadam}{\boldsymbol{\ast}}           % Hadamard product
+\DeclareMathOperator*{\Hadam}{\scalerel*{\hadam}{\sum}}   % Big Hadamard Product
+
+\newcommand{\kron}{\mathop{\otimes}}            % Kronecker product
+\newcommand{\T}{{\sf T}}                  % transposition
+
+\newcommand{\trace}[1]{\mathop{\operator trace}\{#1\}}
+\newcommand{\diag}[1]{\mathop{\operator diag}\{#1\}}  % a vector
+\DeclareMathOperator*{\argmin}{argmin} 
+\DeclareMathOperator*{\p}{p} 
+\DeclareMathOperator*{\Card}{Card} 
+\DeclareMathOperator*{\Error}{Err} 
+\newcommand{\Err}[1]{\Error\!\!\!\!\!\!\!\quad_{#1}}
+
+\newcommand{\vectorize}{\mathop{\operator vec}}
+\newcommand{\unfold}[2]{\matr{#1}_{(#2)}}
+\newcommand{\factor}[2]{\matr{#1}\!^{(\!#2\!)}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%% Chapeaux adaptatif à la taille du mot %%%%%%%%%
+\stackMath
+\newcommand\reallywidehat[1]{%
+\savestack{\tmpbox}{\stretchto{%
+ \scaleto{%
+  \scalerel*[\widthof{\ensuremath{#1}}]{\kern-.6pt\bigwedge\kern-.6pt}%
+  {\rule[-\textheight/2]{1ex}{\textheight}}
+ }{\textheight}% 
+}{0.5ex}}%
+\stackon[1pt]{#1}{\tmpbox}%
+}
+\parskip 1ex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%% Dots more compact %%%%%%%%%
+%\newcommand\ldots{\ifmmode\ldot\!\ldot\!\ldot\else\makebox[1em][c]{\ldot\hfil\ldot\hfil\ldot}\fi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% %%%%%%%% Vertical Triples %%%%%%%%%
+% \newcommand{\triples}[3]{$\left\{\!\!\!\!\!\begin{array}{c}
+%  #1 \\ #2 \\ #3 \\
+% \end{array}\!\!\!\!\!\right\}$}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%% Vertical Triples %%%%%%%%%
+\newcommand{\triples}[3]{$(#1,#2,#3)$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\titre{Factorisation couplée de tenseurs pour l'analyse de données de cytométrie en flux}
 
 \auteur{\coord{Philippe}{Flores}{1},
         \coord{Konstantin}{Usevich}{2},
     \coord{David}{Brie}{1}}
 
-\adresse{\affil{1}{Laboratoire Traitement des Signaux \\
-         1 rue de la Parole, BP 00000, 99000 Nouvelleville Cedex 00, France}
-         \affil{2}{Laboratoire Traitement des Images \\
-         1 rue de la Vision, BP 99999, 00000 Autreville, France}}
+\adresse{\affil{1}{Université de Lorraine, Centre de Recherche en Automatique de Nancy \\
+         Campus Sciences BP 70239, 54506 Vandoeuvre-lès-Nancy, France}
+         \affil{2}{CNRS, Centre de Recherche en Automatique de Nancy \\
+         Campus Sciences BP 70239, 54506 Vandoeuvre-lès-Nancy, France}}
 
 %% Si tous les auteurs ont la m�me adresse %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
@@ -58,201 +132,107 @@
 konstantin.usevich@univ-lorraine.fr\\
 david.brie@univ-lorraine.fr}
 
-\resumefrancais{Les auteurs publiant au GRETSI et utilisant le
-traitement de texte \LaTeXe\ trouveront ci-dessous quelques
-indications destin{\'e}es {\`a} leur faciliter la t{\^a}che. Le
-fichier \texttt{gretsifr.tex} qui contient le pr{\'e}sent
-document respecte les contraintes fix{\'e}es ; recopiez le, par
-exemple sous le nom \texttt{monarticle.tex}, et placez votre
-texte aux endroits appropri{\'e}s.}
+\resumefrancais{Dans ce papier, nous proposons une nouvelle méthode d'analyse automatique de données de cytométrie en flux. Grâce à une modélisation de la distribution par une combinaison de distributions plus simples, nous reformulons le problème comme une factorisation tensorielle couplée de marginales 3D. Pour réduire les coûts de calcul, nous utilisons des stratégies de couplage partiel. Nous proposons aussi un regroupement des termes de rang 1 ainsi qu'un nouvel outils de visualisation de résultats. Nous montrons l'utilité de ladite méthode avec des données simulées et des donneés réelles.}
 
-\resumeanglais{GRETSI authors who are \LaTeXe\ users will find
-above some informations to help them. The file
-\texttt{gretsifr.tex} which contains this document obeys the
-rules; copy it, with the name \texttt{mypaper.tex} for instance,
-and put your text in appropriate fields.}
+\resumeanglais{In this paper, we propose a new method for automated flow cytometry data analysis. By modeling the distribution as a mixture of simpler distributions, we can reformulate the problem as a coupled tensor approximation of 3D-marginals. In order to reduce the computational load, we use partially coupled strategies. We also propose a grouping of rank-1 components together with a new visualization of the results. We demonstrate the usefulness of the proposed methodology on simulated and real data.}
 
 \begin{document}
+
 \maketitle
 
-\section{Format du document}
-\subsection{La classe \texttt{gretsi}}
-Votre article ne doit pas d\'epasser 4 pages, tableaux et figures
-inclus. Il est constitu{\'e} de deux colonnes de 88~mm,
-espac{\'e}es de 6~mm. La classe \texttt{gretsi.cls} au format
-\LaTeXe\ que nous vous recommandons d'utiliser vous permettra de
-r{\'e}aliser automatiquement la mise en page, {\`a} l'aide de la
-commande :
-\begin{verbatim}
-    \documentclass{gretsi}
-\end{verbatim}
-Dans le pr{\'e}ambule de votre fichier, vous devrez alors entrer les
-informations suivantes :
-\begin{itemize}
 
-    \item le titre de l'article :\\
-    \verb!\titre{Titre de l'article}!
+\section{Introduction}
+La cytométrie en flux (CMF) \cite{Fulwyler1965} est une des techniques d'analyse de cellules biologiques les plus utilisées. Elle est largement utilisée dans de nombreux domaines comme l'agriculture, la médecine et la biologie \cite{Seidel2003,Vesey1994}. L'application principale de la CMF est l'immunologie où CMF améliore la connaisance du système immunitaire \cite{Perfetto2004} en permettant aux biologistes de rechercher des populations de cellules rares. Par conséquent, CMF est largement uitilisée dans l'étude de maladies immunologiques \cite{Chattopadhyay2010} ou de cancers \cite{Barlogie1983,Greve2012,Fultang2019}.
 
-    \item le pr{\'e}nom et le nom de chaque auteur, suivi d'un num{\'e}ro
-    renvoyant {\`a} son adresse :\\
-    \verb!\auteur{\coord{Pierre}{Dupont}{1},!\\
-    \verb!        \coord{John}{Smith}{2}}!
+Dans un cytomètre \cite{Shapiro2005}, un flux de cellule est crée et illuminé par des lasers ; la lumière ré-émise est captée par des photodétecteurs mesurant des plages spécifiques de longueurs d'ondes. Avant de passer dans le cytomètre, les cellules sont teintées avec des fluorochromes qui émettent de la lumière dans les longueurs d'ondes associées à un bio-marqueur (par exemple une protéine d'intérêt) ; la réponse de fluorescence des cellules permet d'identifier et de quantifier la présence d'un marqueur spécifique dans un échantillon de cellules.
 
-    \item l'adresse de chaque auteur :\\
-    \verb!\adresse{\affil{1}{Laboratoire \\! \\
-    \verb!         rue, ville, France}     ! \\
-    \verb!         \affil{2}{Laboratoire \\! \\
-    \verb!         rue, ville, France}     !
+Du point de vue analyse de données, un cytomètre produit un nuage de points dans un espace à $M$ dimensions. Le but est de séparer et identifier les différentes populations de cellules dans le nuage de points. L'analyse conventionnelle, basée sur des nuages de points en 2 dimensions, devient incomplètes, subjectives et prend beaucoup de temps au fur et à mesure que le nombre de paramètres de CMF augmente. De ce fait, des méthodes automatiques pour l'analyse de données de CMF ont apparues et sont maitenant désignées comme des méthodes de CMF computaionnelles. Des exemples notables sont SPADE, viSNE ou encore FlowSOM \cite{Qiu2011,Amir2013,VanGassen2015} mais sont coûteuse en calculs et peuvent être difficilement appliquées à de grands ensemble de données. De plus, ces méthodes se basent sur la réduction de dimension, qui rend les interprétations biologiques difficiles et mènent à des résulats insatisfaisants pour des populations de cellules rares.
 
-    \item l'adresse {\'e}lectronique des auteurs :\\
-    \verb!\email{Prenom.Nom@labo.fr, pnom@ecole.fr}!
+Dans ce papier, nous présentons une nouvelle méthode probabiliste appelée CTFlowHD. Pour faire face à la malédiction de la dimension, nous supposons un modèle bayesien naïf pour la densité conjointe multivariée. Ainsi, estimer l'histogramme en $M$ dimensions revient à estimer les facteurs d'un modèle \textit{Canonycal Polyadic} (CP) \cite{Carroll1970,Harshman1970} dont la complexité demeure linéaire avec le nombre de dimensions. En suivant \cite{Kargas2018,Kargas2019}, l'estimation du modèle CP d'ordre $M$ est formulé comme un problème d'approximation couplée des marginales 3D. Pour diminuer encore les coûts de calcul, nous proposons de considérer seulement une partie des marginales 3D lors du couplage. Enfin, pour améliorer l'interprétation de nos résultats, nous introduisons une étape de clustering supplémentaire qui classe directement les facteurs de rang 1.
 
-    \item les r{\'e}sum{\'e}s en fran\c{c}ais et en anglais :\\
-    \verb!\resumefrancais{R\'esum\'e fran\c{c}ais}! \\
-    \verb!\resumeanglais{English written abstract}!
+\section{Modèle bayesien naïf pour \\ l'estimation de densité de probabilité}
 
-    \item enfin, le texte de votre article, et votre bibliographie : \\
-    \verb!\begin{document}! \\
-    \verb!\maketitle! \\
-    \verb!Texte de l'article! \\
-    \verb!\begin{thebibliography}{99}! \\
-    \verb!Les r{\'e}f{\'e}rences! \\
-    \verb!\end{thebibliography}! \\
-    \verb!\end{document}!
+\subsection{Estimation de densité multivariée}
 
-\end{itemize}
+Soit $\vect{x} = \left(X_1,\ldots,X_M\right)$ un vecteur aléatoire prenant des valeurs dans $I_1\times\ldots\times I_M$, où $I_m = \left[x_0^{(m)}, x_K^{(m)}\right]$. En supposant que les lignes de la matrice $\matr{X}$ notées $\vect{x}_n$ sont des réalisations de $\vect{x}$, notre but est d'estimer la densité de probabilité multivariée (PDF) $\p(X_1,\ldots,X_M)$ du vecteur aléatoire $\vect{x}$ à partir de la matrice d'observation $\matr{X}$. Une approche possible d'estimation de densités est de considérer un histogramme en $M$ dimensions. Dans ce cas, chaque intervalle $I_m$ est séparé en $K$ intervalles égaux allant de $\Delta_1^{(m)} = \left[x_0^{(m)}, x_1^{(m)}\right]$ à $\Delta_K^{(m)} = \left[x_{K-1}^{(m)}, x_K^{(m)}\right]$. Cet histogramme, noté $\tens{H}$, peut être interprété comme une PDF jointe discrétisée.
 
-\subsection{Titre et sous-titres}
-Ce document utilise la commande \verb!\section! et la commande
-\verb!\subsection!. Plus bas dans la hi{\'e}rarchie, voici ce qui est
-obtenu :
-\subsubsection{Sous-sous-titre}
-\`A l'aide de la commande \verb!\subsubsection!.
-\paragraph{Sous-sous-sous-titre}
-\`A l'aide de \verb!\paragraph!.
+\begin{align}
+    \tens{H} & =
+     \Pr(X_1\!\in\!\Delta_{k_1}^{(\!1\!)}, \ldots, X_M\!\in\!\Delta_{k_M}^{(\!M\!)}) \label{eq:linkHistoPDF} \\ 
+    & = \int_{X\!_1\in\Delta_{k_1}^{(\!1\!)}}\!\!\!\!\!\!\!\!\!\!\!\!\cdots\hspace{0.2cm}\int_{X\!_M\in\Delta_{k_M}^{(\!M\!)}} \p(X_1,\ldots,X\!_M) dX\!_1\ldots dX\!_M \notag
+\end{align}
 
-\section{Langue et typographie}
-Votre article {\'e}tant sans doute r{\'e}dig{\'e} en fran\c{c}ais, il
-est pr{\'e}f{\'e}rable d'utiliser \cite{Fuhrmann2008} les r{\`e}gles de typographie
-fran\c{c}aises. Si votre moteur \LaTeX\ est francis{\'e}, nous vous
-conseillons d'utiliser le paquet \texttt{babel}, ou le paquet
-\texttt{french}. 
-\newpage
-\subsection{Le paquet \texttt{french}}
-Il suffit d'ins{\'e}rer dans le pr{\'e}ambule de votre fichier la commande :
-\begin{verbatim}
-    \usepackage{french}
-\end{verbatim}
-Si vous utilisez d'autres paquets (par exemple pour l'insertion de
-graphiques), l'auteur du paquet \texttt{french.sty} conseille de faire
-appara{\^\i}tre la commande ci-dessus en dernier dans la liste des
-commandes \verb!\usepackage!.
+Pour estimer l'histogramme à partir de $\matr{X}$, les échantillons sont décomptés dans chaque intervalle en $M$ dimensions :
 
-\subsection{Le paquet \texttt{babel}}
-Moins d{\'e}velopp{\'e} que le pr{\'e}c{\'e}dent, il s'utilise en
-ins{\'e}rant dans le pr{\'e}ambule de votre fichier la commande :
-\begin{verbatim}
-    \usepackage[english,francais]{babel}
-\end{verbatim}
-Ceci indique que le language par d{\'e}faut est le fran\c{c}ais.
-L'anglais est n{\'e}cessaire pour le texte de votre r{\'e}sum{\'e} en
-anglais. Il est {\'e}galement possible d'entrer :
-\begin{verbatim}
-    \usepackage[english,french]{babel}
-\end{verbatim}
-Dans ce cas, si vous disposez aussi du paquet \texttt{french}, il sera
-charg{\'e} automatiquement.
+\begin{align}
+    \tens{H} & = \Pr\left(X_1\!\in\!\Delta_{k_1}^{(\!1\!)}, \ldots, X_M\!\in\!\Delta_{k_M}^{(\!M\!)}\right) \label{eq:naiveHisto} \\ 
+    & \approx \frac{\Card\!\left\{n\!\in\!\nset{1,N} \Big| \vect{x}_n \!\in\! \Delta_{k_1}^{(\!1\!)}\times \ldots\times \Delta_{k_M}^{(\!M\!)} \right\}}{N} \notag
+\end{align}
 
-\subsection{Saisie}
-La ponctuation haute (\verb&; : ? !&) doit {\^e}tre
-pr{\'e}c{\'e}d{\'e}e d'un espace, comme sur une machine {\`a}
-{\'e}crire. Les guillemets {\`a} la fran\c{c}aise sont entr{\'e}s de
-la fa\c{c}on suivante :
-\begin{itemize}
-    \item \verb!\og{}texte entre guillemets\fg{}! avec \texttt{babel};
-    \item \verb!<< texte entre guillemets >>!, ou encore \\
-    \verb!\leftguillemets{}texte\rightguillemets{}! \\
-    avec \texttt{french} 
-\end{itemize}
-Enfin, les majuscules doivent {\^e}tre accentu{\'e}es.
+Cependant, cette approche nécessite a nombre d'échantillons qui grandit de manière exponentielle avec le nombre de dimensions. Pour donner un ordre de grandeur avec $M = 8$ et $K = 20$, l'histogramme est décrit par $K^M \approx 10^10$ valeurs et requiert encore plus d'échantillons pour obtenir une estimation précise. Cela est du à la malédiction de la dimension. Pour pallier ce problème, nous suivons l'approche de \cite{Kargas2018} qui utilise un Modèle Bayesien Naïf (MBN) dont la complexité demeure linéaire avec le nombre de dimension.
 
-\section{Tableaux, figures \\ et math{\'e}matiques}
-Les tableaux doivent {\^e}tre pr{\'e}c{\'e}d{\'e}s par leur
-l{\'e}gende, comme cela est fait pour le tableau
-\ref{puissancededeux}.
-\begin{table}[htb]
-    \legende{\label{puissancededeux}puissance de 2}
-    \begin{center}
-    \begin{tabular}{||c||*{8}{c|}|}
-        \hline\hline
-        $n$   & 1 & 2 & 3 &  4 &  5 &  6 &   7 &   8 \\ \hline
-        $2^n$ & 2 & 4 & 8 & 16 & 32 & 64 & 128 & 256 \\
-        \hline\hline
-    \end{tabular}
-    \end{center}
-\end{table}
-La l{\'e}gende est entr{\'e}e {\`a} l'aide de la commande
-\verb!\legende!, qui remplace la commande \verb!\caption! habituelle
-de \LaTeXe\ (de fa\c{c}on {\`a} harmoniser le r{\'e}sultat produit par
-les paquets \texttt{french} et \texttt{babel}).
+\subsection{Modèle bayesien naïf}
 
-\`A l'inverse, les figures doivent {\^e}tre suivies par leur titre,
-comme c'est le cas de la figure \ref{cercle}.
-\begin{figure}[htb]
-    \begin{center}
-    \setlength{\unitlength}{0.5cm}
-    \begin{picture}(5,5)
-        \put(2.5,2.5){\oval(5,5)}
-        \put(1,1){\line(1,0){3}}
-        \put(4,1){\line(0,1){3}}
-        \put(1,4){\line(1,0){3}}
-        \put(1,1){\line(0,1){3}}
-    \end{picture}
-    \end{center}
-    \legende{\label{cercle}un carr{\'e} dans un ovale}
-\end{figure}
-
-L'insertion de figure \texttt{PostScript} peut {\^e}tre faite
-efficacement {\`a} l'aide des paquets \texttt{graphics},
-\texttt{graphicx} ou \texttt{epsfig}. Pour ins{\'e}rer le fichier
-\texttt{fig.eps}, si l'on veut que la largeur de la figure s'adapte
-{\`a} la largeur de la colonne, il faut entrer, pour le paquet
-\texttt{graphics}, les commandes suivantes :
-\begin{verbatim}
-    \begin{figure}[htb]
-    \begin{center}
-    \resizebox{88mm}{!}{
-    \includegraphics{fig.eps}}
-    \end{center}
-    \legende{titre de la figure}
-    \end{figure}
-\end{verbatim}
-Avec \texttt{graphicx}, il faut entrer :
-\begin{verbatim}
-    \begin{figure}[htb]
-    \begin{center}
-    \includegraphics[width=88mm]{fig.eps}
-    \end{center}
-    \legende{titre de la figure}
-    \end{figure}
-\end{verbatim}
-Avec \texttt{epsfig}, il faut entrer :
-\begin{verbatim}
-    \begin{figure}[htb]
-    \begin{center}
-    \epsfig{file=fig.eps,width=88mm}
-    \end{center}
-    \legende{titre de la figure}
-    \end{figure}
-\end{verbatim}
-Quant aux formules math{\'e}matiques, leur aspect pourra {\^e}tre
-am{\'e}lior{\'e} en utilisant le paquet \texttt{amsmath} de la
-librairie $\mathcal{AMS}$-\LaTeX. Elles seront num\'erot\'ees, comme c'est
-le cas de la formule \ref{formule} :
-\begin{equation}
-   \label{formule}
-   F(x) = \int_{-\infty}^x f(u)\,du
+Le Modèle Bayesien Naïf (MBN) \cite{Kargas2019} introduit une variable latente discrète $L$, tel que les éléments de $\vect{x}$ sont conditionnellement indépendant par rapport à $L$ : \begin{equation}
+    \label{eq:nbmcont}
+    \p(X_1, \ldots, X_M) = \sum\limits_{r=1}^R \Pr(L\!=\!r) \prod\limits_{m=1}^M \p\!\left(X_m | L\!=\!r\right)
 \end{equation}
+En transposant \eqref{eq:nbmcont} dans \eqref{eq:linkHistoPDF}, nous obtenons que le MBN correspond à une Décomposition Canonyque Polyadique (CPD) d'ordre $M$ \cite{Kolda2009} de $\tens{H}$ \cite{Kargas2018}. \begin{align}
+    & \tens{H} = \Pr\left(X_1\!\in\!\Delta_{k_1}^{(\!1\!)}, \ldots, X_M\!\in\!\Delta_{k_M}^{(\!M\!)}\right) \label{eq:nbm} \\ 
+    & = \sum\limits_{r=1}^R \Pr(L\!=\! r) \prod\limits_{m=1}^M \Pr\left(X_m \in \Delta_{k_m}^{(\!m\!)} \Big|L\!=\!r\right) \notag \\
+    & \approx \!\nset{\!\vect{\lambda}\!;\! \factor{A}{1}\!,\!\ldots\!,\!\factor{A}{M}} \! = \!\sum\limits_{r=1}^R \vect{\lambda}_r \vect{a}_r^{(\!1\!)} \out \ldots \out \vect{a}_r^{(\!M\!)}. \notag 
+\end{align}
+Dans ce modèle, $R$ représente le nombre de composante et le rang de la décomposition de $\tens{H}$. De plus, les matrices facteurs $\factor{A}{m} \!=\! \left(\vect{a}_1^{(\!m\!)} \cdots \vect{a}_R^{(\!m\!)}\right) \in \mathbb{R}^{I_m\times R}$ et le vecteur $\vect{\lambda} \in \mathbb{R}^R$ doivent satisfaire les conditions de non-négativité : $\vect{\lambda}>0$, $\factor{A}{m}>0$, et les contraintes de simplexes : $\mathbbm{1}^\T\vect{\lambda}=1$, $\mathbbm{1}^\T\factor{A}{m}=\mathbbm{1}^\T$.
+
+\section{Factorisation tensorielle couplée}
+
+\subsection{Couplage total de tenseurs}
+
+L'idée du couplage de factorisations tensorielles est d'obtenir un MBN en $M$ dimensions grâce à des MBN marginalisés \cite{Kargas2018}. En pratique, les histogrammes 3D sont obtenues facilement tout en gardant les propriétés d'unicités tensorielles que n'ont pas les matrices. Soit $\left( X_i,X_j,X_k\right)$ un triplet de variables aléatoire de $\vect{x}$, le MBN \eqref{eq:nbm} peut être marginaliser pour obtenir un modèle d'ordre 3 qui approche l'histogramme 3D $\tens{H}_{ijk}$.
+\begin{equation}
+    \label{eq:nbm3D}
+    \tens{H}_{ijk} \approx \!\nset{\!\vect{\lambda}\!;\! \factor{A}{i}\!,\!\factor{A}{j}\!,\!\factor{A}{k}\!}
+\end{equation} 
+Pour estimer les facteurs du MBN, nous considérons l'ensemble de tous les triplets possibles $\mathcal{T}\! = \!\left\{ \!\left(i,\!j,\!k\right)\!\in\! \nset{1,M}^3 \Big| i\!<\!j\!<\!k\! \right\}$ et nous résolvons le problème d'optimisation : \begin{align}
+    & \reallywidehat{\vect{\lambda}}, \reallywidehat{\factor{A}{1}}, \ldots, \reallywidehat{\factor{A}{M}} \label{eq:ctfOptim} \\
+    = & \min_{\vect{\lambda},\factor{A}{1},\ldots, \factor{A}{M}} \!\sum_{(i,j,k)\in \mathcal{T}} \!\!\!\!\!\left|\!\left| \tens{F}_{ijk} \!-\! \nset{\!\vect{\lambda}\!;\!\factor{A}{i}\!,\! \factor{A}{j}\!,\! \factor{A}{k}}\!\right|\!\right|_F^2 \notag \\
+    \text{s.t.} & \quad \vect{\lambda}\geq0, \factor{A}{m}\geq0, \mathbbm{1}^{\T}\vect{\lambda}=1, \mathbbm{1}^{\T} \factor{A}{m} = \mathbbm{1}^\T, \notag
+\end{align} appelé factorisation tensorielle couplée totalement. Le problème \eqref{eq:nbm3D} est résolu avec une procédure d'AO-ADMM couplée \cite{Kargas2018}.
+
+\subsection{Conditions d'identifiabilité}
+
+Les décompositions tensorielles possèdent des conditions d'unicité (identifiabilité) fortes \cite{Kolda2009}. En particulier, si tous les $\tens{H}_{ijk}$ sont individuellement génériquement identifiables, c'est-à-dire si $R<\frac{3M-2}{2}$, alors le tenseur de probabilité $\tens{H}$ est aussi identifiable. Cependant, comme beaucoup de $\tens{H}_{ijk}$ partagent des facteurs communs, les conditions d'indentifiabilité peuvent être significativement augmentées. En supposant $M\leq K$, $\tens{H}$ est génériquement identifiable si $R \leq K(M-2)$ \cite{Kargas2018}.
+
+Il faut noter que ces résultats d'identifiabilité dérivent de conditions non-bruitée (décomposition exacte) et sont formulées pour des cas de matrices facteurs réelles (possiblement non-negatives). En pratique, comme le nombre d'échantillons est limité, seuls les $\tens{H}_{ijk}$ bruités sont disponibles ce qui mène à une problème d'approximation de tenseur de rang faible. En ajoutant les contraintes de non-négativité sur les facteurs est avantageux vu que cela assure l'existence et l'unicité de l'approximation tensorielle de rang faible, voir \cite{Qi2016}.
+
+Enfin, si on y regarde de plus près, la preuve des résultats d'identifiabilité de \cite{Kargas2018} révèle que seul l'identifiabilité d'une extension du tenseur à une partition spécifique des variables est requise. En d'autres termes, seul un nombre limité de triplets (définis par la partition des $M$ variables) est nécessaire pour assurer l'identifiabilité. Cette idée est développée dans la sous-section suivante pour réduire les coûts de calculs de la factorisation couplée de tenseurs.
+
+\subsection{Couplage partiel de tenseurs}
+
+Dans \eqref{eq:ctfOptim}, tous les triplets possibles sont utilisés ce qui représente $\binom{M}{3}$ triplets. Le principe de couplage partiel est de ne considérer qu'une sous ensemble des marginales au lieu de tous les histogrammes. Plusieurs stratégies sont possibles mais doivent toutes contenir au moins une fois chaque variable. Dans notre étude, nous considérons 6 stratégies présentées dans le Tableau \ref{tab:triples}.
+\begin{table}
+    \footnotesize
+    \legende{Stratégies de choix des triplets ($M = 10$)}
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline 
+    Stratégie & \begin{tabular}[c]{@{}c@{}}Nombre de triplets\\ ($M = 10$)\end{tabular} & Triplets      \\ \hline 
+    $+2$ & $5$         & {\scriptsize \triples{1}{2}{3}, \triples{3}{4}{5}, \triples{5}{6}{7},}                \\ 
+     &          & {\triples{7}{8}{9} , \triples{9}{10}{1}}                \\ \hline
+    $+1$ & $10$        & {\scriptsize \begin{tabular}[c]{@{}c@{}} \triples{1}{2}{3}, \triples{2}{3}{4}, $\ldots$ , \triples{8}{9}{10}\\ \triples{9}{10}{1}, \triples{10}{1}{2} \end{tabular}}          \\ \hline
+    1/8 & $15 = 120/8$    & triplets choisis aléatoirement   \\ \hline
+    1/4 & $30 = 120/4$    & triplets choisis aléatoirement   \\ \hline
+    1/2 & $60 = 120/2$    & triplets choisis aléatoirement   \\ \hline
+    all & $120=\binom{10}{3}$ & tous les triplets \\ \hline
+    \end{tabular}
+    \label{tab:triples}
+\end{table}
+
+L'idée de couplage partiel est motivée par le fait que le grand nombre d'histogrammes à considérer dans le cas du couplage total. En effet, les $\binom{M}{3}$ histogrammes à estimer mènent à des difficultés en pratique (manque de stockage et complexité computationnelle prohibitive).
+
+\subsection{Évaluation des performances}
+
+Pour étudier les 
 
 \bibliographystyle{IEEEbib}
 \bibliography{refs}
