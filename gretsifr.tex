@@ -130,11 +130,11 @@
 
 \email{philippe.flores@univ-lorraine.fr,
 konstantin.usevich@univ-lorraine.fr\\
-david.brie@univ-lorraine.fr}
+david.brie@univ-lorraine.fr\vspace{-0.8cm}}
 
 \resumefrancais{Dans ce papier, nous proposons une nouvelle méthode d'analyse automatique de données de cytométrie en flux. Grâce à une modélisation de la distribution par une combinaison de distributions plus simples, nous reformulons le problème comme une factorisation tensorielle couplée de marginales 3D. Pour réduire les coûts de calcul, nous utilisons des stratégies de couplage partiel. Nous proposons aussi un regroupement des termes de rang 1 ainsi qu'un nouvel outils de visualisation de résultats. Nous montrons l'utilité de ladite méthode avec des données simulées et des donneés réelles.}
 
-\resumeanglais{In this paper, we propose a new method for automated flow cytometry data analysis. By modeling the distribution as a mixture of simpler distributions, we can reformulate the problem as a coupled tensor approximation of 3D-marginals. In order to reduce the computational load, we use partially coupled strategies. We also propose a grouping of rank-1 components together with a new visualization of the results. We demonstrate the usefulness of the proposed methodology on simulated and real data.}
+\resumeanglais{In this paper, we propose a new method for automated flow cytometry data analysis. By modeling the distribution as a mixture of simpler distributions, we can reformulate the problem as a coupled tensor approximation of 3D-marginals. In order to reduce the computational load, we use partially coupled strategies. We also propose a grouping of rank-1 components together with a new visualization of the results. We demonstrate the usefulness of the proposed methodology on simulated and real data. \vspace{-0.5cm}}
 
 \begin{document}
 
@@ -142,18 +142,22 @@ david.brie@univ-lorraine.fr}
 
 
 \section{Introduction}
-La cytométrie en flux (CMF) est une des techniques d'analyse de cellules biologiques les plus utilisées dans de nombreux domaines comme l'agriculture, la médecine ou la biologie \cite{Seidel2003,Vesey1994}. Son application principale reste l'immunologie où elle améliore la connaisance du système immunitaire \cite{Perfetto2004}, permet l'étude de maladies immunologiques \cite{Chattopadhyay2010} et l'étude de cancers \cite{Greve2012} en permettant aux biologistes de rechercher des populations de cellules rares.
+\vspace{-0.5cm}
+La cytométrie en flux (CMF) est une des techniques d'analyse de cellules biologiques les plus utilisées dans de nombreux domaines comme l'agriculture, la médecine ou la biologie \cite{Saeys2016}. Son application principale reste l'immunologie où elle améliore la connaisance du système immunitaire \cite{Perfetto2004} en permettant aux biologistes de rechercher des populations de cellules rares.
 
-Dans un cytomètre, un flux de cellule est créé et illuminé par des lasers. La lumière ré-émise est séparée vers des photodétecteurs mesurant des plages spécifiques de longueurs d'ondes, plages étant conçues pour détecter des propriétés biologiques spécifiques. Avant de passer dans le cytomètre, les cellules sont teintées avec des fluorochromes qui émettent de la lumière dans les longueurs d'ondes associées à un photodétecteur ; la réponse de fluorescence des cellules permet d'identifier et de quantifier la présence d'un marqueur spécifique dans un échantillon de cellules.
+% Dans un cytomètre, un flux de cellules est créé et illuminé par des lasers. La lumière ré-émise est séparée vers des photodétecteurs mesurant des plages spécifiques de longueurs d'ondes, plages étant conçues pour détecter des propriétés biologiques particulières. Avant de passer dans le cytomètre, les cellules sont teintées avec des fluorochromes qui émettent de la lumière dans les longueurs d'ondes associées à un photodétecteur ; la réponse de fluorescence des cellules permet d'identifier et de quantifier la présence d'un marqueur spécifique dans un échantillon de cellules.
 
-Du point de vue analyse de données, un cytomètre produit un nuage de points dans un espace à $M$ dimensions. Le but est de séparer et identifier les différentes populations de cellules dans le nuage de points. L'analyse conventionnelle, basée sur des nuages de points en 2 dimensions, devient incomplètes, subjectives et prend beaucoup de temps au fur et à mesure que le nombre de paramètres de CMF augmente. De ce fait, des méthodes automatiques pour l'analyse de données de CMF ont apparues comme SPADE, viSNE ou encore FlowSOM \cite{Qiu2011,Amir2013,VanGassen2015} mais sont coûteuse en calculs et peuvent être difficilement appliquées à de grands ensemble de données. De plus, ces méthodes mènent à des résulats insatisfaisants pour des populations de cellules rares et mettent en place des méthodes de visualisations limitées pour des grands nombre de dimensions.
+% Lors de la préparation d'une expérience de cytométrie, les protéines ou gènes recherchés dans un groupe de cellules sont choisis et sont associés à des fluorochromes permettant d'améliorer la séparation entre les cellules qui présentent ou non ces protéines ou gènes. Les cellules passent alors dans un appareil appelé cytomètre qui crée un flux de cellules individuelles qui passe aux travers de lasers. La lumière ré-émise est séparée vers des photodétecteurs, chaque photodétecteur détectant la lumière associée à un fluorochrome et donc à un marqueur biologique.
 
-Dans ce papier, nous présentons une nouvelle méthode probabiliste appelée CTFlowHD. Pour faire face à la malédiction de la dimension, nous supposons un modèle bayesien naïf pour la densité conjointe multivariée. Ainsi, estimer l'histogramme en $M$ dimensions revient à estimer les facteurs d'un modèle \textit{Canonycal Polyadic} (CP) \cite{Carroll1970,Harshman1970} dont la complexité demeure linéaire avec le nombre de dimensions. En suivant \cite{Kargas2018,Kargas2019}, l'estimation du modèle CP d'ordre $M$ est formulé comme un problème d'approximation couplée des marginales 3D. Pour diminuer encore les coûts de calcul, nous proposons de considérer seulement une partie des marginales 3D lors du couplage. Enfin, pour améliorer l'interprétation de nos résultats, nous introduisons une étape de clustering supplémentaire qui classe directement les facteurs de rang 1.
+D'un point de vue analyse de données, un cytomètre produit un nuage de points dans un espace à $M$ dimensions. Le but est de séparer et identifier les différentes populations de cellules. L'analyse conventionnelle, basée sur une succession d'étapes en 2 dimensions, devient incomplètes, subjectives et coûteuse en temps plus le nombre de paramètres augmente. De ce fait, des méthodes automatiques sont apparues \cite{Qiu2011,Amir2013,VanGassen2015} mais sont coûteuses et peuvent difficilement être appliquées à de grands ensemble de données. De plus, ces méthodes mènent à des résulats insatisfaisants pour des populations de cellules rares et ont des visualisations limitées en grandes dimensions.
 
+Dans ce papier, nous présentons une nouvelle méthode probabiliste appelée CTFlowHD. Pour faire face à la malédiction de la dimension, nous supposons un modèle bayesien naïf pour la densité conjointe multivariée. Ainsi, estimer l'histogramme en $M$ dimensions revient à estimer les facteurs d'un modèle tensoriel CP \cite{Harshman1970} dont la complexité demeure linéaire avec le nombre de dimensions. En suivant \cite{Kargas2018}, l'estimation du modèle CP d'ordre $M$ est formulé comme un problème d'approximation couplée des marginales 3D. Pour diminuer encore les coûts de calcul, nous proposons de considérer seulement une partie des marginales 3D lors du couplage. Enfin, pour améliorer l'interprétation de nos résultats, nous introduisons une étape de clustering supplémentaire qui classe directement les facteurs de rang 1.
+
+\vspace{-0.8cm}
 \section{Modèle bayesien naïf pour \\l'estimation de densité de probabilité}
-
-\subsection{Estimation de densité multivariée}
-
+\vspace{-0.2cm}
+\subsection{Estimation de densité multivariée} 
+\vspace{-0.2cm}
 Soit $\vect{x} = \left(X_1,\ldots,X_M\right)$ un vecteur aléatoire prenant des valeurs dans $I_1\times\ldots\times I_M$, où $I_m = \left[x_0^{(m)}, x_K^{(m)}\right]$. En supposant que les lignes de la matrice $\matr{X}$ notées $\vect{x}_{n,:}$ sont des réalisations de $\vect{x}$, notre but est d'estimer la densité de probabilité multivariée (PDF) $\p(X_1,\ldots,X_M)$ du vecteur aléatoire $\vect{x}$ à partir de la matrice d'observation $\matr{X}$. Une approche possible d'estimation de densités est de considérer un histogramme en $M$ dimensions. Dans ce cas, chaque intervalle $I_m$ est séparé en $K$ intervalles égaux allant de $\Delta_1^{(m)} = \left[x_0^{(m)}, x_1^{(m)}\right]$ à $\Delta_K^{(m)} = \left[x_{K-1}^{(m)}, x_K^{(m)}\right]$. Cet histogramme, noté $\tens{H}$, peut être interprété comme une PDF jointe discrétisée.
 
 \begin{align}
@@ -164,22 +168,18 @@ Soit $\vect{x} = \left(X_1,\ldots,X_M\right)$ un vecteur aléatoire prenant des 
 
 Pour estimer l'histogramme à partir de $\matr{X}$, les échantillons sont décomptés dans chaque intervalle en $M$ dimensions :
 
-\begin{align}
-    \tens{H} & = \Pr\left(X_1\!\in\!\Delta_{k_1}^{(\!1\!)}, \ldots, X_M\!\in\!\Delta_{k_M}^{(\!M\!)}\right) \label{eq:naiveHisto} \\ 
-    & \approx \frac{\Card\!\left\{n\!\in\!\nset{1,N} \Big| \vect{x}_n \!\in\! \Delta_{k_1}^{(\!1\!)}\times \ldots\times \Delta_{k_M}^{(\!M\!)} \right\}}{N} \notag
-\end{align}
+\begin{equation}
+    \tens{H} \approx \frac{1}{N}\Card\!\left\{n\!\in\!\nset{1,N} \Big| \vect{x}_n \!\in\! \Delta_{k_1}^{(\!1\!)}\times \ldots\times \Delta_{k_M}^{(\!M\!)} \right\}
+\end{equation}
 
-Cependant, cette approche nécessite a nombre d'échantillons qui grandit de manière exponentielle avec le nombre de dimensions. Pour donner un ordre de grandeur avec $M = 8$ et $K = 20$, l'histogramme est décrit par $K^M \approx 10^10$ valeurs et requiert encore plus d'échantillons pour obtenir une estimation précise. Cela est du à la malédiction de la dimension. Pour pallier ce problème, nous suivons l'approche de \cite{Kargas2018} qui utilise un Modèle Bayesien Naïf (MBN) dont la complexité demeure linéaire avec le nombre de dimension.
+Cependant, cette approche nécessite un nombre d'échantillons qui grandit de manière exponentielle avec le nombre de dimensions. Pour donner un ordre de grandeur avec $M = 8$ et $K = 20$, l'histogramme est décrit par $K^M \approx 10^10$ valeurs et requiert encore plus d'échantillons pour obtenir une estimation précise. Cela est du à la malédiction de la dimension. Pour pallier ce problème, nous suivons l'approche de \cite{Kargas2018} qui utilise un Modèle Bayesien Naïf (MBN) dont la complexité demeure linéaire avec le nombre de dimension.
 
-\subsection{Modèle bayesien naïf}
-
-Le Modèle Bayesien Naïf (MBN) \cite{Kargas2019} introduit une variable latente discrète $L$, tel que les éléments de $\vect{x}$ sont conditionnellement indépendant par rapport à $L$ : \begin{equation}
+Le Modèle Bayesien Naïf (MBN) introduit une variable latente discrète $L$, tel que les éléments de $\vect{x}$ sont conditionnellement indépendant par rapport à $L$ : \begin{equation}
     \label{eq:nbmcont}
     \p(X_1, \ldots, X_M) = \sum\limits_{r=1}^R \Pr(L\!=\!r) \prod\limits_{m=1}^M \p\!\left(X_m | L\!=\!r\right)
 \end{equation}
 En transposant \eqref{eq:nbmcont} dans \eqref{eq:linkHistoPDF}, nous obtenons que le MBN correspond à une Décomposition Canonyque Polyadique (CPD) d'ordre $M$ \cite{Kolda2009} de $\tens{H}$ \cite{Kargas2018}. \begin{align}
-    & \tens{H} = \Pr\left(X_1\!\in\!\Delta_{k_1}^{(\!1\!)}, \ldots, X_M\!\in\!\Delta_{k_M}^{(\!M\!)}\right) \label{eq:nbm} \\ 
-    & = \sum\limits_{r=1}^R \Pr(L\!=\! r) \prod\limits_{m=1}^M \Pr\left(X_m \in \Delta_{k_m}^{(\!m\!)} \Big|L\!=\!r\right) \notag \\
+    & \tens{H} \approx \sum\limits_{r=1}^R \Pr(L\!=\! r) \prod\limits_{m=1}^M \Pr\left(X_m \in \Delta_{k_m}^{(\!m\!)} \Big|L\!=\!r\right) \label{eq:nbm} \\
     & \approx \!\nset{\!\vect{\lambda}\!;\! \factor{A}{1}\!,\!\ldots\!,\!\factor{A}{M}} \! = \!\sum\limits_{r=1}^R \vect{\lambda}_r \vect{a}_r^{(\!1\!)} \out \ldots \out \vect{a}_r^{(\!M\!)}. \notag 
 \end{align}
 Dans ce modèle, $R$ représente le nombre de composante et le rang de la décomposition de $\tens{H}$. De plus, les matrices facteurs $\factor{A}{m} \!=\! \left(\vect{a}_1^{(\!m\!)} \cdots \vect{a}_R^{(\!m\!)}\right) \in \mathbb{R}^{I_m\times R}$ et le vecteur $\vect{\lambda} \in \mathbb{R}^R$ doivent satisfaire les conditions de non-négativité : $\vect{\lambda}>0$, $\factor{A}{m}>0$, et les contraintes de simplexes : $\mathbbm{1}^\T\vect{\lambda}=1$, $\mathbbm{1}^\T\factor{A}{m}=\mathbbm{1}^\T$.
@@ -194,10 +194,11 @@ L'idée du couplage de factorisations tensorielles est d'obtenir un MBN en $M$ d
     \tens{H}_{ijk} \approx \!\nset{\!\vect{\lambda}\!;\! \factor{A}{i}\!,\!\factor{A}{j}\!,\!\factor{A}{k}\!}
 \end{equation} 
 Pour estimer les facteurs du MBN, nous considérons l'ensemble de tous les triplets possibles $\mathcal{T}\! = \!\left\{ \!\left(i,\!j,\!k\right)\!\in\! \nset{1,M}^3 \Big| i\!<\!j\!<\!k\! \right\}$ et nous résolvons le problème d'optimisation : \begin{align}
-    & \reallywidehat{\vect{\lambda}}, \reallywidehat{\factor{A}{1}}, \ldots, \reallywidehat{\factor{A}{M}} \label{eq:ctfOptim} \\
-    = & \min_{\vect{\lambda},\factor{A}{1},\ldots, \factor{A}{M}} \!\sum_{(i,j,k)\in \mathcal{T}} \!\!\!\!\!\left|\!\left| \tens{F}_{ijk} \!-\! \nset{\!\vect{\lambda}\!;\!\factor{A}{i}\!,\! \factor{A}{j}\!,\! \factor{A}{k}}\!\right|\!\right|_F^2 \notag \\
-    \text{s.t.} & \quad \vect{\lambda}\geq0, \factor{A}{m}\geq0, \mathbbm{1}^{\T}\vect{\lambda}=1, \mathbbm{1}^{\T} \factor{A}{m} = \mathbbm{1}^\T, \notag
-\end{align} appelé factorisation tensorielle couplée totalement. Le problème \eqref{eq:nbm3D} est résolu avec une procédure d'AO-ADMM couplée \cite{Kargas2018}.
+    \footnotesize
+    \centering 
+    & \reallywidehat{\vect{\lambda}}, \reallywidehat{\factor{A}{1}}, \ldots, \reallywidehat{\factor{A}{M}} = \!\!\!\!\!\!\min_{\vect{\lambda},\factor{A}{1},\ldots, \factor{A}{M}} \!\!\!\!\sum_{(i,j,k)\in \mathcal{T}} \!\!\!\!\!\left|\!\left| \tens{F}_{ijk} \!-\!\! \nset{\!\vect{\lambda}\!;\!\factor{A}{i}\!,\! \factor{A}{j}\!,\! \factor{A}{k}}\!\right|\!\right|_F^2 \notag \\
+    & \text{s.t.} \quad \vect{\lambda}\geq0, \factor{A}{m}\geq0, \mathbbm{1}^{\T}\vect{\lambda}=1, \mathbbm{1}^{\T} \factor{A}{m} = \mathbbm{1}^\T, \label{eq:ctfOptim}
+\end{align} appelé factorisation tensorielle couplée totalement. \eqref{eq:ctfOptim} est résolu avec une procédure d'AO-ADMM couplée \cite{Kargas2018}.
 
 \subsection{Conditions d'identifiabilité}
 
@@ -209,7 +210,7 @@ Enfin, si on y regarde de plus près, la preuve des résultats d'identifiabilit�
 
 \subsection{Couplage partiel de tenseurs}
 
-Dans \eqref{eq:ctfOptim}, tous les triplets possibles sont utilisés ce qui représente $\binom{M}{3}$ triplets. Le principe de couplage partiel est de ne considérer qu'une sous ensemble des marginales au lieu de tous les histogrammes. Plusieurs stratégies sont possibles mais doivent toutes contenir au moins une fois chaque variable. Dans notre étude, nous considérons 6 stratégies présentées dans la Table \ref{tab:triples}.
+Dans \eqref{eq:ctfOptim}, tous les triplets possibles sont utilisés ce qui représente $\binom{M}{3}$ triplets. Le principe de couplage partiel est de ne considérer qu'une sous ensemble des marginales au lieu de tous les histogrammes pour réduire les coûts de calculs. Plusieurs stratégies sont possibles mais doivent toutes contenir au moins une fois chaque variable. Dans notre étude, nous considérons 6 stratégies présentées dans la Table \ref{tab:triples}.
 \begin{table}
     \footnotesize
     \legende{Stratégies de choix des triplets ($M = 10$)}
@@ -228,11 +229,9 @@ Dans \eqref{eq:ctfOptim}, tous les triplets possibles sont utilisés ce qui repr
     \label{tab:triples}
 \end{table}
 
-L'idée de couplage partiel est motivée par le fait que le grand nombre d'histogrammes à considérer dans le cas du couplage total. En effet, les $\binom{M}{3}$ histogrammes à estimer mènent à des difficultés en pratique (manque de stockage et complexité computationnelle prohibitive).
-
 \subsection{Évaluation des performances}
 
-Pour étudier les différentes stratégies de couplage, nous avons appliqué notre méthode avec toutes les stratégies de la Table \ref{tab:triples} avec des données synthétiques en dimension $M=10$. $R=20$ distributions gaussiennes furent générées aléatoirement et ajoutées ensemble avec des poids $\vect{\lambda}$ pour créer un histogramme $\tens{H}$ théorique. Nous avons ensuite généré plusieurs nombres d'échantillons $N = \left\{ 10^4, 3.10^4, 10^5, 3.10^5,10^6 \right\}$ pour enfin calculé les histogrammes 3D pour $K=30$. Concernant les paramètres de l'AO-ADMM Couplée, nous avons choisi $N_1 = 10^3$ itérations extérieures et $N_2 = 20$ itérations intérieures avec une rang cible égal au nombre de composantes gaussiennes multivariées $R = 20$.
+Pour étudier les différentes stratégies de couplage, nous avons appliqué notre méthode aux stratégies de la Table \ref{tab:triples} avec des données synthétiques en dimension $M=10$. $R=20$ distributions gaussiennes furent générées aléatoirement et ajoutées ensemble avec des poids $\vect{\lambda}$ pour créer un histogramme $\tens{H}$ théorique. Nous avons ensuite généré plusieurs nombres d'échantillons $N = \left\{ 10^4, 3.10^4, 10^5, 3.10^5,10^6 \right\}$ pour enfin calculé les histogrammes 3D pour $K=30$. Concernant les paramètres de l'AO-ADMM Couplée, nous avons choisi $N_1 = 10^3$ itérations extérieures et $N_2 = 20$ intérieures avec une rang égal au nombre de composantes initial $R = 20$.
 
 Pour analyser les performances de notre méthode, nous avons calculé l'erreur sur les marginales 1D et 3D pour chaque stratégie pour 10 réalisations différentes. \begin{equation}
     \label{eq:metricMarg1D}
@@ -241,7 +240,7 @@ Pour analyser les performances de notre méthode, nous avons calculé l'erreur s
     \label{eq:metricMarg3D}
     \Err{3D} \!= \!\!\!\!\!\sum\limits_{i,j,k\in \mathcal{T}} \!\!\left|\!\left|\! \nset{\!\vect{\lambda},\!\factor{A}{i},\!\factor{A}{j},\!\factor{A}{k}\!} \!-\! \nset{\!\reallywidehat{\vect{\lambda}},\!\reallywidehat{\factor{A}{i}},\!\reallywidehat{\factor{A}{j}},\!\reallywidehat{\factor{A}{k}}\!} \!\right|\!\right|^2_F \!
 \end{equation}
-En Figure \ref{fig:errMarg}, les erreurs sur les marginales 1D et 3D sont représentées, montrant que le couplage '1/8' montre des performances similaires à la stratégie de couplage total. Cela montre que les stratégies de couplage partiel sont avantageuses en termes de coûts de calcul puisque la complexité de calcul est linéaire avec le nombre de triplets considérés. En outre, la différence d'estimation des marginales 3D est plus grande que celle des marginales 1D si on compare les différentes stratégies de couplage.
+En Figure \ref{fig:errMarg}, les erreurs sur les marginales 1D et 3D sont représentées, montrant que le couplage '1/8' montre des performances similaires à la stratégie de couplage total. Cela montre que les stratégies de couplage partiel sont avantageuses en termes de coûts de calcul puisque la complexité de calcul est linéaire avec le nombre de triplets considérés. En outre, la différence d'estimation des marginales 3D est plus grande que celle des marginales 1D si on compare les différentes stratégies.
 
 \begin{figure}
     \centering
@@ -262,10 +261,10 @@ En Figure \ref{fig:errMarg}, les erreurs sur les marginales 1D et 3D sont repré
 
 \section{Application à la cytométrie en flux}
 
-Afin de valider notre méthode, nous avons appliqué notre méthode à des données réelles controllées de CMF. 3 populations de cellules ont été teintes puis mélangées avant de passer dans un cytomètre où furent mesurés $M=4$ marqueurs. 3 marqueurs ont été associés aux 3 populations et un quatrième fur ajouté. Les trois populations étaient des Lymphocytes B (LB) pour le marqueur CFSE, des Lymphocyte T pour le marqueur CD4 (LT) et des Macrophages (MP) pour CTV. Le marquage des LT n'ayant pas été optimal, nous n'avons pas pu obtenir une clair séparation entre les cellules CD4+ (LT) et les autres cellules (MP et LB). Les trois populations furent mélangées selon 3 proportions différentes estimées manuellement par \textit{gating} (Figure \ref{fig:casdecole}). Les paramètres de l'expérience sont résumés dans la Table \ref{tab:pop}.
+Afin de valider notre méthode, nous avons appliqué notre méthode à des données réelles controllées de CMF. 3 populations de cellules ont été teintes puis mélangées ($N = 10^5$ cellules) avant de passer dans un cytomètre où furent mesurés $M=4$ marqueurs. 3 marqueurs ont été associés aux 3 populations et un quatrième fur ajouté. Les 3 populations étaient des Lymphocytes B (LB) pour le marqueur CFSE, des Lymphocyte T pour le marqueur CD4 (LT) et des Macrophages (MP) pour CTV. Le marquage des LT n'ayant pas été optimal, nous n'avons pas pu obtenir une clair séparation entre les cellules CD4+ (LT) et les autres cellules (MP et LB). Les 3 populations furent mélangées selon 3 proportions différentes estimées manuellement par \textit{gating} (Figure \ref{fig:casdecole}). Les paramètres de l'expérience sont résumés dans la Table \ref{tab:pop}.
 \begin{figure}
     \centerline{\includegraphics[width = 0.8\linewidth]{figures/cadecole.pdf}}
-    \caption{\textit{Gating} manuel des 3 populations avec Kaluza. La figure montre 3 portes : P3 sépre les cellules CFSE+ (LB), P4 montre les cellules LT and P5 les cellules CTV+ (MP). La somme des 3 portes ne fait pas 100\% car certaines cellules n'appartiennent à aucune porte.}
+    \caption{\textit{Gating} des 3 populations. La figure montre 3 portes : P3 sépare les cellules CFSE+ (LB), P4 les cellules LT and P5 les cellules CTV+ (MP). Certaines cellules n'appartiennent à aucune porte.}
     \label{fig:casdecole}
 \end{figure}
 \begin{table}[]
@@ -284,25 +283,16 @@ Afin de valider notre méthode, nous avons appliqué notre méthode à des donn�
     \end{tabular}
 \end{table}
 
-\subsection{Prétraitement des données de cytométrie}
-
-Avec $M$ marqueurs pour $N$ cellules, les données de CMF sont interprétées comme une matrice $N\times M$ $\matr{X}$, telle que chaque colonne $\vect{x}_{n,:}$ contient les caractéristiques de la $n$-ième cellule. $N$ peut valoir des milliers voire des millions de cellules tandis que le nombre de dimensions $M$ varie de 4 à 30. Avant d'analyser des données de CMF, trois étapes de prétraitement sont effectuées : \begin{itemize}
-    \item La \emph{Compensation} qui permet de supprimer le problème de chevauchement des fluorochromes. Cela conduit à une transformation linéaire $\matr{X} = \matr{X}_{raw}\matr{S}^{-1}$, où la matrice de compensation $\matr{S}$ est définie par l'utilisateur \cite{Roederer2002}. 
-    \item Une transormation d'échelle non linéaire appelée \emph{"Logicle"} qui permet une meilleure visualisation à la fois pour les grandes et les faibles valeurs de fluorescences \cite{Parks2006}.
-    \item L'estimation des histogrammes 3D avec $K=20$ intervalles.
-\end{itemize}
-
 \subsection{Visualisation et clustering}
 
-Après avoir appliqué notre méthode, nous obtenons $M$ matrices facteurs et $\vect{\lambda}$ ce qui représente toutes les propriétés de nos $R$ composantes. Pour interpréter au mieux un jeu de données, nous devons développer de bons outils de visualisations qui permettront aux utilisateurs d'extraire le plus d'informations.
+Après avoir appliqué notre méthode, nous obtenons $M$ matrices facteurs et $\vect{\lambda}$ ce qui représente toutes les propriétés de nos $R$ composantes. Pour interpréter au mieux un jeu de données, nous devons développer des outils de visualisations qui permettront aux utilisateurs d'extraire le plus d'informations.
 
-Premièrement, le choix du nombre de composantes est crucial. Si $R$ est trop petit, les populations seront fusionnées et ne seront pas séparables. D'autre part, si $R$ est plus grand que le nombre de populations de cellules, certaines populations vont apparaitre dans plusieurs composantes. Afin de pallier ce problème, nous regroupons les composantes ayant des propriétés similaires, tout en prenant un grand nombre de composantes $R$. Pour ce faire, nous procédons à un clustering hiérarchique (\textit{single linkage}) des termes de rang 1 pour obtenir un dendrogramme. Les composantes sont alors groupées si leur distance relative \eqref{eq:distancemetacluster} est inférieure à une valeur de seuil.
+De ce fait, le choix du nombre de composantes est crucial. Si $R$ est trop petit, les populations ne seront pas séparables. Il faut donc regrouper les composantes ayant des propriétés similaires, tout en prenant un grand nombre de composantes $R$. Nous procédons alors à un clustering hiérarchique (\textit{single linkage}) pour obtenir un dendrogramme. Les composantes sont alors groupées si leur distance \eqref{eq:distancemetacluster} est inférieure à une valeur de seuil.
 \begin{equation}
     \label{eq:distancemetacluster}
-    D(r,s) = 1-\prod\limits_{m=1}^M \left< \frac{\vect{a}^{(m)}_r}{\left|\!\left|\vect{a}^{(m)}_r\right|\!\right|}, \frac{\vect{a}^{(m)}_s}{\left|\!\left|\vect{a}^{(m)}_s\right|\!\right|} \right>
+    D(r,s) = 1-\prod\limits_{m=1}^M \left< \vect{a}^{(m)}_r,\vect{a}^{(m)}_s \right>
 \end{equation}
-
-Sur la Figure \ref{fig:casdecoleHD}, trois groupes de composantes on été obtenus et séparés par la procédure de clustering. Cela permet d'estimer la taille des 3 populations de cellules et de comparer notre métohde avec les résultats de \textit{gating}. Notre méthode est capable d'estimer une répartition où les populations rares comme les MP sont séparées grâce au clustering hiérarchique (Table \ref{tab:choiceR}). Les tailles des deux autres populations de cellules ont été estimées précisément. À noter que $R=60$ est au-dessus de la borne théorique d'identifiabilité de \cite{Kargas2018}, mais fourni tout de même une reconstruction précise, ce qui indique que les résultats d'indentifiabilité peuvent être améliorer. Avec une stratégie de couplage partiel, nous avons été capables de retrouver des proportions du même ordre de grandeur mais moins précise que pour le couplage total (voir Table \ref{tab:coupling}).
+Sur la Figure \ref{fig:casdecoleHD}, 3 groupes de composantes on été obtenus et séparés par la procédure de clustering. Cela permet d'estimer la taille des 3 populations de cellules et de comparer notre métohde avec les résultats de \textit{gating}. Notre méthode est capable d'estimer une répartition où les populations rares comme les MP sont séparées grâce au clustering hiérarchique (Table \ref{tab:choiceR}). Les tailles des deux autres populations de cellules ont été estimées précisément. À noter que $R=60$ est au-dessus de la borne théorique d'identifiabilité de \cite{Kargas2018}, mais fourni tout de même une reconstruction précise, ce qui indique que les résultats d'indentifiabilité peuvent être améliorer. Avec une stratégie de couplage partiel, nous avons été capables de retrouver des proportions du même ordre de grandeur mais moins précise que pour le couplage total (voir Table \ref{tab:coupling}).
 
 \begin{table}[]
     \centering
@@ -334,17 +324,13 @@ Sur la Figure \ref{fig:casdecoleHD}, trois groupes de composantes on été obten
 \begin{figure}[]
     \centering
     \includegraphics[width = \linewidth]{figures/casdecoleHD.pdf}
-    \caption{CTFlowHD pour les données controllées contenant 3 populations. \textbf{En haut}: Matrices facteurs représentant les $M\!=\!4$ propriétés pour les $R\!=\!25$ composantes représentés par lignes. \textbf{Au milieu} : dendrogramme obtenu grâce au clustering hierarchique (\textit{single linkage}). \textbf{En bas} : taille de chaque composante en \%.}
+    \caption{CTFlowHD pour les données controllées contenant 3 populations. \textbf{En haut}: Matrices facteurs représentant les $M\!=\!4$ propriétés pour les $R\!=\!25$ composantes représentés par lignes. \textbf{Au milieu} : dendrogramme obtenu grâce au clustering hierarchique. \textbf{En bas} : taille de chaque composante en \%.}
     \label{fig:casdecoleHD}
 \end{figure}
 
 \section{Conclusion}
 
 Nous proposons dans ce papier une nouvelle méthode probabiliste qui permet aux biologistes d'interpréter des données de cytométrie en flux sans perte de dimension lors des visualisations, a contrario avec les méthodes existantes. Notre méthode est capable de reconstruire des histogrammes en grandes dimensions et de les séparer en populations de cellules. Même si la factorisation couplée de tenseurs a une complexité de calcul polynomial, le couplage partiel permet d'aller encore plus loin en diminuant encore les temps de calculs tout en gardant des performances similaires d'estimation.
-
-\section{Remerciements}
-
-Les auteurs remercient chaleureusement Anne-Béatrice Notarantonio et Guillaume Harle pour leur expertise avisée et l'apport des données de cytométrie.
 
 \bibliographystyle{IEEEbib}
 \bibliography{refs}
